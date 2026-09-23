@@ -73,7 +73,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getRequestURI().startsWith("/auth")
-                || request.getRequestURI().startsWith("/v1/user/register-to-maintenance-service");
+        return request.getRequestURI().startsWith("/auth");
     }
 }

@@ -33,7 +33,6 @@ public class SecurityConfig {
                                 "/h2-console/**",
                                 "/actuator/**"
                         ).permitAll()
-                                .requestMatchers("/v1/user/register-to-maintenance-service").permitAll()
                                 .requestMatchers("/v1/**").authenticated()
                         .requestMatchers("/actuator/**").authenticated()
                         .anyRequest().authenticated()
