@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy User Service
 
 on:
   push:
@@ -29,6 +29,7 @@ jobs:
           DEPLOY_SSH_KEY_B64: ${{ secrets.DEPLOY_SSH_KEY_B64 }}
           CLOUDFLARE_ACCESS_CLIENT_ID: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
           CLOUDFLARE_ACCESS_CLIENT_SECRET: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
+
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
@@ -64,9 +65,9 @@ jobs:
             "echo 'SSH connection successful'"
 
       # --------------------------------------------------
-      # 4. Deploy
+      # 4. Deploy User Service
       # --------------------------------------------------
-      - name: Deploy
+      - name: Deploy User Service
         env:
           PORT: ${{ secrets.PORT }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -78,11 +79,29 @@ jobs:
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           TELEGRAM_BOT_URL: ${{ secrets.TELEGRAM_BOT_URL }}
           EUREKA_URL: ${{ secrets.EUREKA_URL }}
+
         run: |
           ssh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" << EOF
             set -e
 
-            cd /opt/maintenance-service-user-service 2>/dev/null || cd /opt/maintenance-service
+            PROJECT_DIR="/opt/maintenance-service-user-service"
+
+            echo "========================================"
+            echo "Checking project directory..."
+            echo "========================================"
+
+            if [ ! -d "\$PROJECT_DIR" ]; then
+              echo "ERROR: User Service directory does not exist:"
+              echo "\$PROJECT_DIR"
+              exit 1
+            fi
+
+            cd "\$PROJECT_DIR"
+
+            echo "========================================"
+            echo "Current directory:"
+            echo "\$PWD"
+            echo "========================================"
 
             echo "========================================"
             echo "Pulling latest code..."
@@ -94,6 +113,11 @@ jobs:
             echo "========================================"
             echo "Creating production .env..."
             echo "========================================"
+
+            if [ ! -f .env.example ]; then
+              echo "ERROR: .env.example does not exist"
+              exit 1
+            fi
 
             cp .env.example .env
 
@@ -113,22 +137,41 @@ jobs:
             chmod 600 .env
 
             echo "========================================"
-            echo "Checking Docker Compose configuration..."
+            echo "Docker Compose services:"
+            echo "========================================"
+
+            docker compose config --services
+
+            echo "========================================"
+            echo "Checking User Service..."
+            echo "========================================"
+
+            if ! docker compose config --services | grep -qx "user-service"; then
+              echo "ERROR: 'user-service' is not defined in Docker Compose"
+              exit 1
+            fi
+
+            echo "User Service found."
+
+            echo "========================================"
+            echo "Validating Docker Compose..."
             echo "========================================"
 
             docker compose config > /dev/null
 
+            echo "Docker Compose configuration is valid."
+
             echo "========================================"
-            echo "Building Docker image..."
+            echo "Building User Service..."
             echo "========================================"
 
-            docker compose build --pull
+            docker compose build --pull user-service
 
             echo "========================================"
             echo "Starting User Service..."
             echo "========================================"
 
-            docker compose up -d
+            docker compose up -d user-service
 
             echo "========================================"
             echo "Removing unused Docker images..."
@@ -146,7 +189,7 @@ jobs:
             echo "User Service logs:"
             echo "========================================"
 
-            docker compose logs --tail=50
+            docker compose logs --tail=50 user-service
 
             echo "========================================"
             echo "Deployment complete."
