@@ -3,43 +3,29 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        PORT: ${PORT}
-
     env_file:
       - .env
-
     ports:
       - "${PORT}:${PORT}"
-
     container_name: user-service
-
     restart: unless-stopped
-
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
     networks:
       - maintenance-net
 
   redis:
     image: redis:7-alpine
-
     container_name: maintenance-redis
-
     restart: unless-stopped
-
     ports:
       - "127.0.0.1:6379:6379"
-
     command:
       - redis-server
       - --appendonly
       - "yes"
-
     volumes:
       - redis-data:/data
-
     networks:
       - maintenance-net
 
