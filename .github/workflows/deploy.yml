@@ -1,0 +1,154 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # --------------------------------------------------
+      # 1. Install Cloudflare Tunnel
+      # --------------------------------------------------
+      - name: Install cloudflared
+        run: |
+          curl -L \
+            --output cloudflared.deb \
+            https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+
+          sudo dpkg -i cloudflared.deb
+
+      # --------------------------------------------------
+      # 2. Configure SSH
+      # --------------------------------------------------
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY_B64: ${{ secrets.DEPLOY_SSH_KEY_B64 }}
+          CLOUDFLARE_ACCESS_CLIENT_ID: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
+          CLOUDFLARE_ACCESS_CLIENT_SECRET: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s' "$DEPLOY_SSH_KEY_B64" \
+            | base64 --decode \
+            > ~/.ssh/deploy_key
+
+          chmod 600 ~/.ssh/deploy_key
+
+          ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null
+
+          cat > ~/.ssh/config << EOF
+          Host ${{ secrets.DEPLOY_HOST }}
+              HostName ${{ secrets.DEPLOY_HOST }}
+              User ${{ secrets.DEPLOY_USER }}
+              IdentityFile ~/.ssh/deploy_key
+              IdentitiesOnly yes
+              ProxyCommand env CLOUDFLARE_ACCESS_CLIENT_ID="$CLOUDFLARE_ACCESS_CLIENT_ID" CLOUDFLARE_ACCESS_CLIENT_SECRET="$CLOUDFLARE_ACCESS_CLIENT_SECRET" cloudflared access ssh --hostname %h
+              StrictHostKeyChecking no
+          EOF
+
+          chmod 600 ~/.ssh/config
+
+      # --------------------------------------------------
+      # 3. Test SSH connection
+      # --------------------------------------------------
+      - name: Test SSH connection
+        run: |
+          ssh \
+            -o ConnectTimeout=15 \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "echo 'SSH connection successful'"
+
+      # --------------------------------------------------
+      # 4. Deploy
+      # --------------------------------------------------
+      - name: Deploy
+        env:
+          PORT: ${{ secrets.PORT }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          TELEGRAM_BOT_URL: ${{ secrets.TELEGRAM_BOT_URL }}
+          EUREKA_URL: ${{ secrets.EUREKA_URL }}
+        run: |
+          ssh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" << EOF
+            set -e
+
+            cd /opt/maintenance-service-user-service 2>/dev/null || cd /opt/maintenance-service
+
+            echo "========================================"
+            echo "Pulling latest code..."
+            echo "========================================"
+
+            git fetch origin master
+            git reset --hard origin/master
+
+            echo "========================================"
+            echo "Creating production .env..."
+            echo "========================================"
+
+            cp .env.example .env
+
+            sed -i \
+              -e "s|^PORT=.*|PORT=$PORT|" \
+              -e "s|^DATABASE_URL=.*|DATABASE_URL=$DATABASE_URL|" \
+              -e "s|^DATABASE_USERNAME=.*|DATABASE_USERNAME=$DATABASE_USERNAME|" \
+              -e "s|^DATABASE_PASSWORD=.*|DATABASE_PASSWORD=$DATABASE_PASSWORD|" \
+              -e "s|^REDIS_HOST=.*|REDIS_HOST=$REDIS_HOST|" \
+              -e "s|^REDIS_PORT=.*|REDIS_PORT=$REDIS_PORT|" \
+              -e "s|^REDIS_PASSWORD=.*|REDIS_PASSWORD=$REDIS_PASSWORD|" \
+              -e "s|^JWT_SECRET_KEY=.*|JWT_SECRET_KEY=$JWT_SECRET_KEY|" \
+              -e "s|^TELEGRAM_BOT_URL=.*|TELEGRAM_BOT_URL=$TELEGRAM_BOT_URL|" \
+              -e "s|^EUREKA_URL=.*|EUREKA_URL=$EUREKA_URL|" \
+              .env
+
+            chmod 600 .env
+
+            echo "========================================"
+            echo "Checking Docker Compose configuration..."
+            echo "========================================"
+
+            docker compose config > /dev/null
+
+            echo "========================================"
+            echo "Building Docker image..."
+            echo "========================================"
+
+            docker compose build --pull
+
+            echo "========================================"
+            echo "Starting User Service..."
+            echo "========================================"
+
+            docker compose up -d
+
+            echo "========================================"
+            echo "Removing unused Docker images..."
+            echo "========================================"
+
+            docker image prune -f
+
+            echo "========================================"
+            echo "Deployment status:"
+            echo "========================================"
+
+            docker compose ps
+
+            echo "========================================"
+            echo "User Service logs:"
+            echo "========================================"
+
+            docker compose logs --tail=50
+
+            echo "========================================"
+            echo "Deployment complete."
+            echo "========================================"
+          EOF
