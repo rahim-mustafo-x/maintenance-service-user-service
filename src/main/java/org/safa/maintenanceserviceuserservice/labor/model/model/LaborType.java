@@ -1,6 +1,6 @@
-package org.safa.maintenanceserviceuserservice.labor.model.model
+package org.safa.maintenanceserviceuserservice.labor.model.model;
 
-enum class LaborType {
+public enum LaborType {
     PLUMBER,
     ELECTRICIAN,
     PAINTER,

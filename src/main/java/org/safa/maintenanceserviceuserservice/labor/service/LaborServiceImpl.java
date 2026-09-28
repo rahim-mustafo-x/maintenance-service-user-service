@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,7 +88,7 @@ public class LaborServiceImpl implements LaborService {
 
     @Override
     public Set<LaborType> jobTypes() {
-        return new HashSet<>(LaborType.getEntries());
+        return new HashSet<>(Arrays.asList(LaborType.values()));
     }
 
     @Override
