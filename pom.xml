@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="
+            http://maven.apache.org/POM/4.0.0
+            https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <!-- ========================================================= -->
-    <!-- Spring Boot                                               -->
+    <!-- Parent                                                    -->
     <!-- ========================================================= -->
 
     <parent>
@@ -37,12 +40,13 @@
     </properties>
 
     <!-- ========================================================= -->
-    <!-- Spring Cloud BOM                                           -->
+    <!-- Dependency Management                                      -->
     <!-- ========================================================= -->
 
     <dependencyManagement>
         <dependencies>
 
+            <!-- Spring Cloud BOM -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -55,13 +59,13 @@
     </dependencyManagement>
 
     <!-- ========================================================= -->
-    <!-- Dependencies                                                -->
+    <!-- Dependencies                                               -->
     <!-- ========================================================= -->
 
     <dependencies>
 
         <!-- ===================================================== -->
-        <!-- Spring Web                                             -->
+        <!-- Web                                                     -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -70,7 +74,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Spring Data JPA                                        -->
+        <!-- JPA / Hibernate                                         -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -79,7 +83,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Spring Security                                        -->
+        <!-- Security                                                 -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -88,7 +92,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Redis                                                   -->
+        <!-- Redis                                                    -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -97,7 +101,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- PostgreSQL                                              -->
+        <!-- PostgreSQL                                               -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -107,7 +111,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Lombok                                                  -->
+        <!-- Lombok                                                   -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -117,7 +121,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- JWT                                                     -->
+        <!-- JWT                                                      -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -141,7 +145,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Eureka Client                                           -->
+        <!-- Eureka                                                   -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -150,7 +154,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- OpenFeign                                               -->
+        <!-- OpenFeign                                                -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -159,7 +163,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Actuator                                                -->
+        <!-- Actuator                                                 -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -168,7 +172,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- SpringDoc / Swagger                                     -->
+        <!-- SpringDoc / Swagger                                      -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -178,7 +182,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Development                                             -->
+        <!-- DevTools                                                 -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -189,7 +193,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Test                                                     -->
+        <!-- Tests                                                    -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -211,7 +215,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Rest Assured                                            -->
+        <!-- REST Assured                                             -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -222,7 +226,7 @@
         </dependency>
 
         <!-- ===================================================== -->
-        <!-- Testcontainers                                          -->
+        <!-- Testcontainers                                           -->
         <!-- ===================================================== -->
 
         <dependency>
@@ -255,16 +259,29 @@
         <plugins>
 
             <!-- ================================================= -->
-            <!-- Spring Boot                                        -->
+            <!-- Spring Boot                                         -->
             <!-- ================================================= -->
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+
+                <configuration>
+                    <layers>
+                        <enabled>true</enabled>
+                    </layers>
+
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
             <!-- ================================================= -->
-            <!-- Maven Compiler                                     -->
+            <!-- Java Compiler                                       -->
             <!-- ================================================= -->
 
             <plugin>
@@ -272,7 +289,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
 
                 <configuration>
-
                     <release>25</release>
 
                     <annotationProcessorPaths>
@@ -283,12 +299,11 @@
                         </path>
 
                     </annotationProcessorPaths>
-
                 </configuration>
             </plugin>
 
             <!-- ================================================= -->
-            <!-- GraalVM Native                                      -->
+            <!-- GraalVM Native Image                                -->
             <!-- ================================================= -->
 
             <plugin>
