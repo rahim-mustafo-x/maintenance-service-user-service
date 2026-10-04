@@ -11,8 +11,6 @@ services:
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    networks:
-      - maintenance-net
 
   redis:
     image: redis:7-alpine
