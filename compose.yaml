@@ -26,12 +26,6 @@ services:
       - "yes"
     volumes:
       - redis-data:/data
-    networks:
-      - maintenance-net
 
 volumes:
   redis-data:
-
-networks:
-  maintenance-net:
-    external: true
