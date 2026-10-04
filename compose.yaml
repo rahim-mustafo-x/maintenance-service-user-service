@@ -29,9 +29,6 @@ services:
       - redis-data:/data
     networks:
       - maintenance-net
-    depends_on:
-      service-registry:
-        condition: service_healthy
 
 volumes:
   redis-data:
