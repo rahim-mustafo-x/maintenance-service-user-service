@@ -9,9 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableDiscoveryClient
 @EnableFeignClients
 public class MaintenanceServiceApplication {
-
     static void main(String[] args) {
         SpringApplication.run(MaintenanceServiceApplication.class, args);
     }
-
 }
