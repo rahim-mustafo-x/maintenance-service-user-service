@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
@@ -16,6 +17,12 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
      * In here we are taking user model via user_name.
      * It is considered to be used only when login formats like UserDetailsService**/
     @Query("select u from UserEntity u where u.username=:username")
+    @Query("select u from UserEntity u where u.id <> :currentUserId and " +
+            "(lower(u.fullName) like lower(concat('%', :query, '%')) or " +
+            "lower(u.username) like lower(concat('%', :query, '%'))) order by u.fullName")
+    List<UserEntity> searchForChat(@Param("query") String query,
+                                   @Param("currentUserId") long currentUserId);
+
     Optional<UserEntity> findByUsername(@Param("username") String username);
 
     /** we have to add exists by unique things such as username phone number  in order to avoid 403**/
