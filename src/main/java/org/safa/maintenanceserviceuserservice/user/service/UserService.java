@@ -284,7 +284,7 @@ public class UserService {
         }
 
         return userRepository
-                .findByIdNotAndFullNameContainingIgnoreCaseOrIdNotAndUsernameContainingIgnoreCase(
+                .findByIdNotAndFullNameContainingIgnoreCaseOrIdNotAndPhoneNumberContaining(
                         currentUserId,
                         normalizedQuery,
                         currentUserId,
@@ -298,7 +298,7 @@ public class UserService {
                 .map(user -> new ChatUserResponse(
                         user.getId(),
                         user.getFullName(),
-                        user.getUsername()
+                        user.getPhoneNumber()
                 ))
                 .toList();
     }
@@ -306,7 +306,7 @@ public class UserService {
     public ChatUserResponse getChatUser(long userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        return new ChatUserResponse(user.getId(), user.getFullName(), user.getUsername());
+        return new ChatUserResponse(user.getId(), user.getFullName(), user.getPhoneNumber());
     }
 
     public UserResponse getCurrentUser(long userId) {
