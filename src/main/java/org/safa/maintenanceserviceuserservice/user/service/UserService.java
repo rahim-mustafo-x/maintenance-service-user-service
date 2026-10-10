@@ -278,8 +278,28 @@ public class UserService {
     }
 
     public List<ChatUserResponse> searchChatUsers(String query, long currentUserId) {
-        return userRepository.searchForChat(query, currentUserId).stream()
-                .map(user -> new ChatUserResponse(user.getId(), user.getFullName(), user.getUsername()))
+        String normalizedQuery = query == null ? "" : query.trim();
+        if (normalizedQuery.length() < 2) {
+            return List.of();
+        }
+
+        return userRepository
+                .findByIdNotAndFullNameContainingIgnoreCaseOrIdNotAndUsernameContainingIgnoreCase(
+                        currentUserId,
+                        normalizedQuery,
+                        currentUserId,
+                        normalizedQuery,
+                        org.springframework.data.domain.Sort.by(
+                                org.springframework.data.domain.Sort.Direction.ASC,
+                                "fullName"
+                        )
+                )
+                .stream()
+                .map(user -> new ChatUserResponse(
+                        user.getId(),
+                        user.getFullName(),
+                        user.getUsername()
+                ))
                 .toList();
     }
 
