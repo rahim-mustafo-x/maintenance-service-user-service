@@ -3,6 +3,7 @@ package org.safa.maintenanceserviceuserservice.user.controller;
 import org.safa.maintenanceserviceuserservice.ApiResponse;
 import org.safa.maintenanceserviceuserservice.user.model.dto.UpdateUserRequest;
 import org.safa.maintenanceserviceuserservice.user.model.dto.UserResponse;
+import org.safa.maintenanceserviceuserservice.user.model.dto.ChatUserResponse;
 import org.safa.maintenanceserviceuserservice.admin.exceptions.AlreadyExistsException;
 import org.safa.maintenanceserviceuserservice.admin.exceptions.BadRequestException;
 import org.safa.maintenanceserviceuserservice.admin.exceptions.NotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/user")
@@ -91,6 +93,45 @@ public class UserController {
                             .build());
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<ChatUserResponse>>> searchUsers(
+            @RequestParam("q") String query) {
+        if (query == null || query.isBlank() || query.trim().length() < 2) {
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(ApiResponse.<List<ChatUserResponse>>builder()
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .message("Search query must contain at least 2 characters")
+                            .build());
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(ApiResponse.<List<ChatUserResponse>>builder()
+                        .code(HttpStatus.OK.value())
+                        .data(userService.searchChatUsers(query.trim(), getCurrentUserId()))
+                        .build());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ChatUserResponse>> getUserById(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(ApiResponse.<ChatUserResponse>builder()
+                            .code(HttpStatus.OK.value())
+                            .data(userService.getChatUser(id))
+                            .build());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(ApiResponse.<ChatUserResponse>builder()
+                            .code(HttpStatus.NOT_FOUND.value())
+                            .message(e.getMessage())
+                            .build());
+        }
+    }
+
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         try {
