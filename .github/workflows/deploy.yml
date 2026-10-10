@@ -5,6 +5,11 @@ on:
     branches:
       - master
 
+# Prevent two pushes from deploying the same service at the same time.
+concurrency:
+  group: deploy-user-service
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -160,6 +165,26 @@ jobs:
             docker compose config > /dev/null
 
             echo "Docker Compose configuration is valid."
+
+            echo "========================================"
+            echo "Cleaning up stale User Service containers..."
+            echo "========================================"
+
+            # Older Compose project names can leave a container such as
+            # <project>_user-service behind. Remove only stale containers
+            # explicitly labeled as this Compose service, never the current
+            # canonical container name.
+            docker ps -aq --filter "name=user-service" | while read -r container_id; do
+              [ -n "$container_id" ] || continue
+
+              container_name="$(docker inspect --format '{{.Name}}' "$container_id" | sed 's#^/##')"
+              compose_service="$(docker inspect --format '{{ index .Config.Labels "com.docker.compose.service" }}' "$container_id")"
+
+              if [ "$compose_service" = "user-service" ] && [ "$container_name" != "user-service" ]; then
+                echo "Removing stale container: $container_name ($container_id)"
+                docker rm -f "$container_id"
+              fi
+            done
 
             echo "========================================"
             echo "Building User Service..."
