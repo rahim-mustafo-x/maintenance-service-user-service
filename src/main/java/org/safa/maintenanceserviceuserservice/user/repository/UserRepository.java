@@ -19,11 +19,11 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("select u from UserEntity u where u.username=:username")
     Optional<UserEntity> findByUsername(@Param("username") String username);
 
-    List<UserEntity> findByIdNotAndFullNameContainingIgnoreCaseOrIdNotAndUsernameContainingIgnoreCase(
+    List<UserEntity> findByIdNotAndFullNameContainingIgnoreCaseOrIdNotAndPhoneNumberContaining(
             long excludedIdForName,
             String fullNameQuery,
-            long excludedIdForUsername,
-            String usernameQuery,
+            long excludedIdForPhone,
+            String phoneNumberQuery,
             org.springframework.data.domain.Sort sort);
 
     /** we have to add exists by unique things such as username phone number  in order to avoid 403**/
