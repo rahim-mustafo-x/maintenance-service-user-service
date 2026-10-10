@@ -19,11 +19,12 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("select u from UserEntity u where u.username=:username")
     Optional<UserEntity> findByUsername(@Param("username") String username);
 
-    @Query("select u from UserEntity u where u.id <> :currentUserId and " +
-            "(lower(u.fullName) like lower(concat('%', :query, '%')) or " +
-            "lower(u.username) like lower(concat('%', :query, '%'))) order by u.fullName")
-    List<UserEntity> searchForChat(@Param("query") String query,
-                                   @Param("currentUserId") long currentUserId);
+    List<UserEntity> findByIdNotAndFullNameContainingIgnoreCaseOrIdNotAndUsernameContainingIgnoreCase(
+            long excludedIdForName,
+            String fullNameQuery,
+            long excludedIdForUsername,
+            String usernameQuery,
+            org.springframework.data.domain.Sort sort);
 
     /** we have to add exists by unique things such as username phone number  in order to avoid 403**/
     @Query("select count(u) > 0 from UserEntity u where u.username=:username")
