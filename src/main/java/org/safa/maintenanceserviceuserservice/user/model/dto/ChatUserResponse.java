@@ -4,5 +4,5 @@ package org.safa.maintenanceserviceuserservice.user.model.dto;
 public record ChatUserResponse(
         long id,
         String fullName,
-        String userName
+        String phoneNumber
 ) {}
