@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import org.safa.maintenanceserviceuserservice.admin.exceptions.*;
 import org.safa.maintenanceserviceuserservice.user.model.dto.UpdateUserRequest;
 import org.safa.maintenanceserviceuserservice.user.model.dto.UserResponse;
+import org.safa.maintenanceserviceuserservice.user.model.dto.ChatUserResponse;
 import org.safa.maintenanceserviceuserservice.user.model.dto.auth.AuthUserResponse;
 import org.safa.maintenanceserviceuserservice.user.model.dto.auth.ChangePasswordRequest;
 import org.safa.maintenanceserviceuserservice.user.model.dto.auth.CodeRequest;
@@ -30,6 +31,7 @@ import org.springframework.web.client.RestClient;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -273,6 +275,18 @@ public class UserService {
             return -1;
         }
         return userEntity.get().getId();
+    }
+
+    public List<ChatUserResponse> searchChatUsers(String query, long currentUserId) {
+        return userRepository.searchForChat(query, currentUserId).stream()
+                .map(user -> new ChatUserResponse(user.getId(), user.getFullName(), user.getUsername()))
+                .toList();
+    }
+
+    public ChatUserResponse getChatUser(long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        return new ChatUserResponse(user.getId(), user.getFullName(), user.getUsername());
     }
 
     public UserResponse getCurrentUser(long userId) {
