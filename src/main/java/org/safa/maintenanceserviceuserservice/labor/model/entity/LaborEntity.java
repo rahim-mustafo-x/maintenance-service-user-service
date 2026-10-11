@@ -2,6 +2,7 @@ package org.safa.maintenanceserviceuserservice.labor.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.safa.maintenanceserviceuserservice.ratings.model.entity.RatingEntity;
 import org.safa.maintenanceserviceuserservice.user.model.entity.UserEntity;
 import org.safa.maintenanceserviceuserservice.labor.model.model.LaborType;
 
@@ -30,4 +31,7 @@ public class LaborEntity {
     //                                    | effecting all entity    | when removed from list auto removed by entity as well
     @OneToMany(mappedBy = "labor",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WorkingHoursEntity> workingHours;
+
+    @OneToMany(mappedBy = "labor",  cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RatingEntity> ratings;
 }

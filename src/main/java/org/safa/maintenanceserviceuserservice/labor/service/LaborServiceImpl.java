@@ -15,14 +15,16 @@ import org.safa.maintenanceserviceuserservice.labor.model.entity.WorkingHoursEnt
 import org.safa.maintenanceserviceuserservice.labor.model.model.LaborType;
 import org.safa.maintenanceserviceuserservice.labor.repository.LaborRepository;
 import org.safa.maintenanceserviceuserservice.labor.repository.WorkingHoursRepository;
+import org.safa.maintenanceserviceuserservice.ratings.model.entity.RatingEntity;
+import org.safa.maintenanceserviceuserservice.ratings.repository.RatingRepository;
 import org.safa.maintenanceserviceuserservice.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,7 @@ public class LaborServiceImpl implements LaborService {
     private final LaborRepository laborRepository;
     private final UserRepository userRepository;
     private final WorkingHoursRepository workingHoursRepository;
+    private final RatingRepository ratingRepository;
     @Override
     @Transactional
     public boolean saveWorkingHours(@NonNull LaborCreateRequest laborCreateRequest, long userId) {
@@ -83,6 +86,7 @@ public class LaborServiceImpl implements LaborService {
                 .fullName(user.getFullName())
                 .laborTypes(laborEntity.getLaborTypes())
                 .workingHours(workingHours)
+                .averageRating(calculateAverageRating(ratingRepository.findByLaborId(laborEntity.getId())))
                 .build();
     }
 
@@ -151,5 +155,11 @@ public class LaborServiceImpl implements LaborService {
     public boolean deleteWorkingHours(long id, long userId) {
         workingHoursRepository.deleteByUserIdAndWork(id, userId);
         return true;
+    }
+    private static double calculateAverageRating(List<RatingEntity> ratings){
+        return ratings.stream()
+                .mapToInt(RatingEntity::getStarCount)
+                .average()
+                .orElse(0.0);
     }
 }

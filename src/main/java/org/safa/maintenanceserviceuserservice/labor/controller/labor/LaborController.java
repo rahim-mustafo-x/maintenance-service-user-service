@@ -68,10 +68,10 @@ public class LaborController implements LaborApi {
     @Override
     public ResponseEntity<ApiResponse<?>> laborMe() {
         try {
-            return ResponseEntity.status(HttpStatus.FOUND)
+            return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(ApiResponse.builder()
-                            .code(HttpStatus.FOUND.value())
+                            .code(HttpStatus.OK.value())
                             .data(laborService.laborById(getCurrentUserId()))
                             .build());
         }catch (NotFoundException e){
@@ -106,10 +106,10 @@ public class LaborController implements LaborApi {
     @Override
     public ResponseEntity<ApiResponse<?>> laborById(long id) {
         try {
-            return ResponseEntity.status(HttpStatus.FOUND)
+            return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(ApiResponse.<LaborResponse>builder()
-                            .code(HttpStatus.FOUND.value())
+                            .code(HttpStatus.OK.value())
                             .data(laborService.laborById(id))
                             .build());
         }catch (NotFoundException e){

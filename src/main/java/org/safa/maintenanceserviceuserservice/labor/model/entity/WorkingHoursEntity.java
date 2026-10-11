@@ -23,6 +23,6 @@ public class WorkingHoursEntity {
     private LocalTime endTime;
     //        | best for performance for a list to get the same senior instead of different with same id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "labor")
+    @JoinColumn(name = "labor_id")
     private LaborEntity labor;
 }

@@ -19,4 +19,5 @@ public class LaborResponse {
     private Long userId;
     private String fullName;
     private Set<WorkingHourResponse> workingHours;
+    private double averageRating;
 }
