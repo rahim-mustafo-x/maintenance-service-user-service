@@ -48,6 +48,7 @@ public class LaborServiceImpl implements LaborService {
                     return LaborEntity.builder()
                             .laborTypes(laborCreateRequest.laborTypes())
                             .user(user)
+                            .workingHours(new HashSet<>())
                             .build();
                 });
         Set<WorkingHoursEntity> workingHoursEntities = laborCreateRequest.workingHoursRequests().stream().map(item -> {
