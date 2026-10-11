@@ -87,10 +87,10 @@ public class LaborController implements LaborApi {
     @Override
     public ResponseEntity<ApiResponse<?>> searchLabors(LaborType type, int page, int size) {
         try {
-            return ResponseEntity.status(HttpStatus.FOUND)
+            return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(ApiResponse.<Page<SearchLaborResponse>>builder()
-                            .code(HttpStatus.FOUND.value())
+                            .code(HttpStatus.OK.value())
                             .data(laborService.searchLabors(type, page, size))
                             .build());
         }catch (NotFoundException e){

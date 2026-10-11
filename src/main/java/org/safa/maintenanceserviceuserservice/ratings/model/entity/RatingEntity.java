@@ -17,6 +17,7 @@ import java.time.Instant;
 @Builder
 public class RatingEntity {
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
     //star count (3,4,5)
     private int starCount;

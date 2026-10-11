@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("v1/ratings")
 public interface RatingApi {
     @PostMapping
-    ResponseEntity<ApiResponse<Void>> addRate(@RequestBody AddRating rating);
+    ResponseEntity<ApiResponse<Rating>> addRate(@RequestBody AddRating rating);
     @PutMapping
-    ResponseEntity<ApiResponse<Void>> editRate(@RequestBody EditRating rating);
+    ResponseEntity<ApiResponse<Rating>> editRate(@RequestBody EditRating rating);
     @DeleteMapping
-    ResponseEntity<ApiResponse<Void>> removeRate(@RequestParam long rateId);
+    ResponseEntity<ApiResponse<Boolean>> removeRate(@RequestParam long rateId);
     @GetMapping
     ResponseEntity<ApiResponse<Page<Rating>>> findRatesByLaborId(@RequestParam long laborId, @RequestParam int page, @RequestParam int size);
 }

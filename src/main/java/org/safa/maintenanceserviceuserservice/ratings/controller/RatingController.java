@@ -19,25 +19,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class RatingController implements RatingApi {
     private final RatingService ratingService;
     @Override
-    public ResponseEntity<ApiResponse<Void>> addRate(AddRating rating) {
+    public ResponseEntity<ApiResponse<Rating>> addRate(AddRating rating) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(ApiResponse.<Void>builder()
+                    .body(ApiResponse.<Rating>builder()
                             .code(HttpStatus.OK.value())
                             .data(ratingService.addRate(rating))
                             .build());
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(ApiResponse.<Void>builder()
+                    .body(ApiResponse.<Rating>builder()
                             .code(HttpStatus.NOT_FOUND.value())
                             .message(e.getMessage())
                             .build());
         } catch (BadRequestException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(ApiResponse.<Void>builder()
+                    .body(ApiResponse.<Rating>builder()
                             .code(HttpStatus.BAD_REQUEST.value())
                             .message(e.getMessage())
                             .build());
@@ -45,25 +45,25 @@ public class RatingController implements RatingApi {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> editRate(EditRating rating) {
+    public ResponseEntity<ApiResponse<Rating>> editRate(EditRating rating) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(ApiResponse.<Void>builder()
+                    .body(ApiResponse.<Rating>builder()
                             .code(HttpStatus.OK.value())
                             .data(ratingService.editRate(rating))
                             .build());
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(ApiResponse.<Void>builder()
+                    .body(ApiResponse.<Rating>builder()
                             .code(HttpStatus.NOT_FOUND.value())
                             .message(e.getMessage())
                             .build());
         } catch (BadRequestException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(ApiResponse.<Void>builder()
+                    .body(ApiResponse.<Rating>builder()
                             .code(HttpStatus.BAD_REQUEST.value())
                             .message(e.getMessage())
                             .build());
@@ -71,18 +71,18 @@ public class RatingController implements RatingApi {
     }
 
     @Override
-    public ResponseEntity<ApiResponse<Void>> removeRate(long rateId) {
+    public ResponseEntity<ApiResponse<Boolean>> removeRate(long rateId) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(ApiResponse.<Void>builder()
+                    .body(ApiResponse.<Boolean>builder()
                             .code(HttpStatus.OK.value())
                             .data(ratingService.removeRate(rateId))
                             .build());
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(ApiResponse.<Void>builder()
+                    .body(ApiResponse.<Boolean>builder()
                             .code(HttpStatus.NOT_FOUND.value())
                             .message(e.getMessage())
                             .build());

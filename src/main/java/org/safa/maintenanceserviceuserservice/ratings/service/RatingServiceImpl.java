@@ -5,6 +5,7 @@ import org.safa.maintenanceserviceuserservice.admin.exceptions.BadRequestExcepti
 import org.safa.maintenanceserviceuserservice.admin.exceptions.NotFoundException;
 import org.safa.maintenanceserviceuserservice.labor.model.entity.LaborEntity;
 import org.safa.maintenanceserviceuserservice.labor.repository.LaborRepository;
+import org.safa.maintenanceserviceuserservice.ratings.RatingMap;
 import org.safa.maintenanceserviceuserservice.ratings.model.AddRating;
 import org.safa.maintenanceserviceuserservice.ratings.model.EditRating;
 import org.safa.maintenanceserviceuserservice.ratings.model.Rating;
@@ -20,41 +21,45 @@ import org.springframework.transaction.annotation.Transactional;
 public class RatingServiceImpl implements RatingService {
     private final RatingRepository ratingRepository;
     private final LaborRepository laborRepository;
+    private final RatingMap ratingMap;
 
     @Override
     @Transactional
-    public Void addRate(AddRating rating) {
+    public Rating addRate(AddRating rating) {
         if (laborRepository.existsById(rating.laborId())){
             if (starValid(rating.starCount())){
                 LaborEntity laborEntity = laborRepository.findById(rating.laborId()).orElseThrow(() -> new NotFoundException("Labor not found"));
-                ratingRepository.save(RatingEntity.builder()
-                        .starCount(rating.starCount())
-                        .description(rating.description())
-                        .date(rating.date())
-                        .labor(laborEntity)
-                        .build());
+                return ratingMap.toRating(
+                        ratingRepository.save(RatingEntity.builder()
+                                .starCount(rating.starCount())
+                                .description(rating.description())
+                                .date(rating.date())
+                                .labor(laborEntity)
+                                .build())
+                );
             }else {
                 throw new BadRequestException("star should be between 0..5");
             }
         }else {
             throw new NotFoundException("Labor not found");
         }
-        return Void.TYPE.cast(null);
     }
 
     @Override
     @Transactional
-    public Void editRate(EditRating rating) {
+    public Rating editRate(EditRating rating) {
         if (ratingRepository.existsById(rating.id())) {
             if (starValid(rating.starCount())){
                 LaborEntity laborEntity = laborRepository.findById(rating.laborId()).orElseThrow(() -> new NotFoundException("Labor not found"));
-                ratingRepository.save(RatingEntity.builder()
-                        .id(rating.id())
-                        .starCount(rating.starCount())
-                        .description(rating.description())
-                        .date(rating.date())
-                        .labor(laborEntity)
-                        .build());
+                return ratingMap.toRating(
+                        ratingRepository.save(RatingEntity.builder()
+                                .id(rating.id())
+                                .starCount(rating.starCount())
+                                .description(rating.description())
+                                .date(rating.date())
+                                .labor(laborEntity)
+                                .build())
+                );
             }
             else{
                 throw new BadRequestException("star should be between 0..5");
@@ -62,18 +67,17 @@ public class RatingServiceImpl implements RatingService {
         }else {
             throw  new NotFoundException("Rating not found");
         }
-        return Void.TYPE.cast(null);
     }
 
     @Override
     @Transactional
-    public Void removeRate(long rateId) {
+    public boolean removeRate(long rateId) {
         if (ratingRepository.existsById(rateId)) {
             ratingRepository.deleteById(rateId);
+            return true;
         } else {
             throw new NotFoundException("Not found");
         }
-        return Void.TYPE.cast(null);
     }
 
     @Override

@@ -6,8 +6,8 @@ import org.safa.maintenanceserviceuserservice.ratings.model.Rating;
 import org.springframework.data.domain.Page;
 
 public interface RatingService {
-    Void addRate(AddRating rating);
-    Void editRate(EditRating rating);
-    Void removeRate(long rateId);
+    Rating addRate(AddRating rating);
+    Rating editRate(EditRating rating);
+    boolean removeRate(long rateId);
     Page<Rating> findRatesByLaborId(long laborId, int page, int size);
 }
