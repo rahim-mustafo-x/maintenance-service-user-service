@@ -32,7 +32,7 @@ public class UserController {
         return userService.findUserIdByUserName(username);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<ApiResponse<?>> deleteUser() {
         try {
             if (userService.deleteUser(getCurrentUserId())){
@@ -61,7 +61,7 @@ public class UserController {
     }
 
 
-    @PutMapping("update")
+    @PutMapping
     public ResponseEntity<ApiResponse<?>> updateUser(@RequestBody UpdateUserRequest request){
         try {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
@@ -135,10 +135,10 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         try {
-            return ResponseEntity.status(HttpStatus.FOUND)
+            return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(ApiResponse.<UserResponse>builder()
-                            .code(HttpStatus.FOUND.value())
+                            .code(HttpStatus.OK.value())
                             .data(userService.getCurrentUser(getCurrentUserId()))
                             .build());
         }catch (NotFoundException e){
