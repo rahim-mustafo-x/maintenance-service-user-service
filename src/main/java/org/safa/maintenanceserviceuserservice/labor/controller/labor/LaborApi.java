@@ -15,27 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
-/**
- * <pre>
- *   /v1/labor
- *  │
- *  ├── POST   /                         → create labor
- *  ├── GET    /me                       → my labor
- *  ├── GET    /search                   → search labors
- *  ├── GET    /{id}                     → public labor
- *  ├── POST   /me/types                 → add type
- *  ├── DELETE /me/types/{type}          → remove type
- *  │
- *  ├── GET    /me/working-hours
- *  ├── PUT    /me/working-hours/{id}
- *  ├── DELETE /me/working-hours/{id}
- *  │
- *  └── PUT /v1/labor/me/image → to upload the image of labor for the profile
- *  │done
- *  └── PATCH  /me/availability
- * </pre>
- */
-
 @RequestMapping("/v1/labor")
 public interface LaborApi {
     //creates the profile
