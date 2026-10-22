@@ -18,7 +18,7 @@ public interface LaborService {
             long userId
     );
 
-    Page<SearchLaborResponse> searchLabors(
+    Page<SearchLaborResponse> labors(
             LaborType type,
             int page,
             int size

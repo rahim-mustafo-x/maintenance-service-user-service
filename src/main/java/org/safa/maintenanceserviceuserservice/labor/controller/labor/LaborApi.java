@@ -22,8 +22,8 @@ public interface LaborApi {
     ResponseEntity<ApiResponse<?>> setWorkingHours(@RequestBody LaborCreateRequest laborCreateRequest);
     @GetMapping("/me")
     ResponseEntity<ApiResponse<?>> laborMe();
-    @GetMapping("/search")
-    ResponseEntity<ApiResponse<?>> searchLabors(@RequestParam LaborType type, @RequestParam int page, @RequestParam int size);
+    @GetMapping("/type")
+    ResponseEntity<ApiResponse<?>> labors(@RequestParam LaborType type, @RequestParam int page, @RequestParam int size);
     @GetMapping("/{id}")
     ResponseEntity<ApiResponse<?>> laborById(@PathVariable long id);
     //return all job types as a list

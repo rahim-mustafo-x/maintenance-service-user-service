@@ -112,7 +112,7 @@ public class LaborServiceImpl implements LaborService {
     }
 
     @Override
-    public Page<SearchLaborResponse> searchLabors(LaborType type, int page, int size) {
+    public Page<SearchLaborResponse> labors(LaborType type, int page, int size) {
         return laborRepository.findAllByType(type, PageRequest.of(page, size)).map(item->new SearchLaborResponse(item.getId(), item.getLaborTypes(), item.getUser().getFullName()));
     }
 
